@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resgate Social - Amor por Vidas</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <header>
+        <h1>Resgate Social - Amor por Vidas</h1>
+        <p>Rede Integrada de Acolhimento, Reagrupamento Familiar e Gestao de Vagas</p>
+        <nav>
+            <a href="#vagas" class="nav-link active" data-target="vagas">Vagas e Unidades</a>
+            <a href="#resgate" class="nav-link" data-target="resgate">Solicitar Resgate</a>
+            <a href="#busca" class="nav-link" data-target="busca">Busca Familiar</a>
+            <a href="#voluntarios" class="nav-link" data-target="voluntarios">Seja Agente/Voluntario</a>
+            <a href="#doacoes" class="nav-link" data-target="doacoes">Pontos de Doacao</a>
+            <a href="#painel" class="nav-link" data-target="painel">Painel do Gestor</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- 1. VAGAS E CASAS DE APOIO (RF07, RF08) -->
+        <section id="vagas" class="section active">
+            <h2>Casas de Apoio e Vagas Disponiveis</h2>
+            <div id="lista-casas" class="grid-cards">
+                <p>Carregando vagas em tempo real...</p>
+            </div>
+        </section>
+
+        <!-- 2. SOLICITAÇÃO DE RESGATE (RF04, RF09) -->
+        <section id="resgate" class="section">
+            <h2>Solicitar Resgate de Usuario</h2>
+            <div class="form-box">
+                <form id="form-resgate">
+                    <div class="form-group">
+                        <label for="nome">Nome Completo do Assistido *</label>
+                        <input type="text" id="nome" required placeholder="Digite o nome do assistido">
+                    </div>
+                    <div class="form-group">
+                        <label for="data-nasc">Data de Nascimento</label>
+                        <input type="date" id="data-nasc">
+                    </div>
+                    <div class="form-group">
+                        <label for="sexo">Sexo</label>
+                        <select id="sexo">
+                            <option value="">Selecione...</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Feminino">Feminino</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dependentes">Dependentes / Acompanhantes</label>
+                        <input type="text" id="dependentes" placeholder="Ex: 1 filho (menor de idade)">
+                    </div>
+                    <div class="form-group">
+                        <label for="familiares">Contato de Familiares Conhecidos</label>
+                        <textarea id="familiares" rows="2" placeholder="Nomes, parentesco ou telefones conhecidos"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="casa">Casa de Apoio Desejada *</label>
+                        <select id="casa" required>
+                            <option value="">Carregando unidades...</option>
+                        </select>
+                    </div>
+                    <div class="form-group-checkbox" style="margin-top: 15px;">
+    <input type="checkbox" id="aceite-lgpd" required>
+    <label for="aceite-lgpd" style="font-size: 0.85rem; color: #555;">
+        Declaro que os dados fornecidos são verídicos e autorizo o tratamento das informações para fins exclusivos de acolhimento e assistência social, conforme a LGPD (Lei nº 13.709/2018).
+    </label>
+</div>
+                    <button type="submit" class="btn-primary">Enviar Solicitacao de Resgate</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 3. BUSCA FAMILIAR / COMUNICAÇÃO INTERNA (RF12) -->
+        <section id="busca" class="section">
+            <h2>Busca e Localizacao Familiar</h2>
+            <div class="form-box">
+                <p>Digite o nome do familiar procurado para verificar se ele consta em nossa rede de acolhimento.</p>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <input type="text" id="busca-familiar" placeholder="Digite o nome completo para pesquisar...">
+                </div>
+                <button type="button" onclick="buscarFamiliar()" class="btn-primary">Buscar na Rede</button>
+                <div id="resultado-busca" style="margin-top: 1.5rem;"></div>
+            </div>
+        </section>
+
+        <!-- 4. CADASTRO DE AGENTE / VOLUNTÁRIO (RF05) -->
+        <section id="voluntarios" class="section">
+            <h2>Cadastro de Agentes e Voluntarios</h2>
+            <div class="form-box">
+                <form id="form-voluntario">
+                    <div class="form-group">
+                        <label for="vol-nome">Nome Completo *</label>
+                        <input type="text" id="vol-nome" required placeholder="Seu nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label for="vol-cpf">CPF *</label>
+                        <input type="text" id="vol-cpf" required placeholder="000.000.000-00">
+                    </div>
+                    <div class="form-group">
+                        <label for="vol-contato">Telefone / WhatsApp *</label>
+                        <input type="text" id="vol-contato" required placeholder="(00) 00000-0000">
+                    </div>
+                    <div class="form-group">
+                        <label for="vol-email">E-mail *</label>
+                        <input type="email" id="vol-email" required placeholder="seu@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="vol-sexo">Sexo</label>
+                        <select id="vol-sexo">
+                            <option value="">Selecione...</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Feminino">Feminino</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="vol-area">Area de Atuacao / Especialidade</label>
+                        <select id="vol-area">
+                            <option value="Agente de Campo">Agente de Campo (Resgate)</option>
+                            <option value="Assistência Social">Assistencia Social</option>
+                            <option value="Psicologia">Apoio Psicologico</option>
+                            <option value="Logistica / Doacoes">Logistica e Doacoes</option>
+                            <option value="Geral">Apoio Geral</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary">Cadastrar como Agente</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 5. CONSULTAR PONTOS DE DOAÇÃO (RF13) -->
+        <section id="doacoes" class="section">
+            <h2>Pontos de Doacao e Apoio Financeiro</h2>
+            <div class="grid-cards">
+                <div class="card">
+                    <h3>Doacoes Fisicas (Alimentos e Roupas)</h3>
+                    <p><strong>Ponto Central:</strong> Av. Principal das Vidas, 1000 - Centro</p>
+                    <p><strong>Horario de Recebimento:</strong> Segunda a Sexta, das 08h as 18h</p>
+                    <p><strong>Itens Prioritarios:</strong> Alimentos nao pereciveis, produtos de higiene pessoal, agasalhos e cobertores.</p>
+                </div>
+                <div class="card">
+                    <h3>Apoio Financeiro via PIX</h3>
+                    <p><strong>Chave PIX (CNPJ):</strong> 00.123.456/0001-89</p>
+                    <p><strong>Favorecido:</strong> Associação Resgate Social Amor por Vidas</p>
+                    <p><strong>Banco:</strong> Banco do Brasil (Ag: 1234-5 | C/C: 98765-4)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. PAINEL DO GESTOR (RF01, RF02, RF03, RF06, RF10, RF11) -->
+        <section id="painel" class="section">
+            <h2>Painel do Gestor (Area Restrita)</h2>
+
+            <!-- Tela de Login (RF01) -->
+            <div id="area-login" class="form-box">
+                <p>Acesso exclusivo para administradores e gestores cadastrados.</p>
+                <form id="form-login">
+                    <div class="form-group">
+                        <label for="login-email">E-mail de Gestor</label>
+                        <input type="email" id="login-email" required placeholder="gestor@amorporvidas.org.br">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-senha">Senha</label>
+                        <input type="password" id="login-senha" required placeholder="******">
+                    </div>
+                    <button type="submit" class="btn-primary">Entrar no Painel</button>
+                </form>
+            </div>
+
+            <!-- Conteudo Administrativo -->
+            <div id="conteudo-painel" style="display: none;">
+                
+                <div class="user-session-bar">
+                    <span>Conectado como: <strong id="usuario-logado">---</strong></span>
+                    <button type="button" onclick="realizarLogout()" class="btn-secondary">Sair do Sistema</button>
+                </div>
+
+                <!-- Sub-Navegação do Painel -->
+                <div class="sub-nav">
+                    <button class="sub-nav-btn active" onclick="navegarSubPainel('sub-resgates')">Solicitacoes de Resgate</button>
+                    <button class="sub-nav-btn" onclick="navegarSubPainel('sub-assistidos')">Usuarios Resgatados</button>
+                    <button class="sub-nav-btn" onclick="navegarSubPainel('sub-add-casa')">Cadastrar Casa de Apoio</button>
+                    <button class="sub-nav-btn" onclick="navegarSubPainel('sub-voluntarios')">Agentes / Voluntarios</button>
+                </div>
+
+                <!-- Sub-painel: Aprovacao de Resgates (RF10, RF11) -->
+                <div id="sub-resgates" class="sub-painel active">
+                    <h3>Solicitacoes de Resgate Pendentes e Em Atendimento</h3>
+                    <div id="lista-resgates-painel" class="grid-cards"><p>Carregando solicitações...</p></div>
+                </div>
+
+                <!-- Sub-painel: Assistidos -->
+                <div id="sub-assistidos" class="sub-painel">
+                    <h3>Usuarios Cadastrados na Rede</h3>
+                    <div id="lista-assistidos-painel" class="grid-cards"><p>Carregando registros...</p></div>
+                </div>
+
+                <!-- Sub-painel: Cadastrar Casa de Apoio  -->
+                <div id="sub-add-casa" class="sub-painel">
+                    <h3>Cadastrar Nova Casa de Apoio</h3>
+                    <div class="form-box" style="margin: 0;">
+                        <form id="form-add-casa">
+                            <div class="form-group">
+                                <label for="casa-nome">Nome Fantasia *</label>
+                                <input type="text" id="casa-nome" required placeholder="Ex: Casa de Apoio Esperanca">
+                            </div>
+                            <div class="form-group">
+                                <label for="casa-endereco">Endereco Completo *</label>
+                                <input type="text" id="casa-endereco" required placeholder="Rua, Numero, Bairro, Cidade">
+                            </div>
+                            <div class="form-group">
+                                <label for="casa-telefone">Telefone *</label>
+                                <input type="text" id="casa-telefone" required placeholder="(00) 0000-0000">
+                            </div>
+                            <div class="form-group">
+                                <label for="casa-email">E-mail de Contato</label>
+                                <input type="email" id="casa-email" placeholder="contato@casa.org.br">
+                            </div>
+                            <div class="form-group">
+                                <label for="casa-gestor">Nome do Gestor Responsavel</label>
+                                <input type="text" id="casa-gestor" placeholder="Nome do responsavel">
+                            </div>
+                            <div class="form-group">
+                                <label for="casa-vagas">Total de Vagas *</label>
+                                <input type="number" id="casa-vagas" required min="1" value="10">
+                            </div>
+                            <button type="submit" class="btn-primary">Salvar Casa de Apoio</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Sub-painel: Voluntários -->
+                <div id="sub-voluntarios" class="sub-painel">
+                    <h3>Agentes e Voluntarios Cadastrados</h3>
+                    <div id="lista-voluntarios-painel" class="grid-cards"><p>Carregando agentes...</p></div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+<footer style="text-align: center; padding: 20px; font-size: 0.8rem; color: #666; margin-top: 40px; border-top: 1px solid #ddd;">
+    <p>Rede de Acolhimento &copy; 2026 — Dados protegidos e tratados exclusivamente para finalidades assistenciais.</p>
+</footer>
+</html>
